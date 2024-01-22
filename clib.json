@@ -1,0 +1,25 @@
+{
+    "name": "dense",
+    "version": "0.0.0",
+    "repo": "goodcleanfun/dense",
+    "description": "Generic dense matrices",
+    "keywords": ["matrix", "dense", "array", "numeric"],
+    "license": "MIT",
+    "dependencies": {
+      "goodcleanfun/aligned": "*",
+      "goodcleanfun/file_utils": "*",
+      "goodcleanfun/num_arrays": "*",
+      "goodcleanfun/vector": "*"
+    },
+    "src": [
+      "src/matrix.h",
+      "src/double_matrix.h",
+      "src/float_matrix.h",
+      "src/uint32_matrix.h",
+      "src/uint64_matrix.h"
+    ],
+    "development": {
+      "silentbicycle/greatest": "1.5.0"
+    }
+  }  
+  
