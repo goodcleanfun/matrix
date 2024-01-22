@@ -1,2 +1,2 @@
 # dense
-Generic dense matrix operations
+Generic dense matrices and operations
