@@ -5,6 +5,9 @@
     "description": "Generic dense matrices",
     "keywords": ["matrix", "dense", "array", "numeric"],
     "license": "MIT",
+    "development": {
+      "silentbicycle/greatest": "*"
+    },
     "dependencies": {
       "goodcleanfun/aligned": "*",
       "goodcleanfun/file_utils": "*",
@@ -17,9 +20,6 @@
       "src/float_matrix.h",
       "src/uint32_matrix.h",
       "src/uint64_matrix.h"
-    ],
-    "development": {
-      "silentbicycle/greatest": "1.5.0"
-    }
+    ]
   }  
   
