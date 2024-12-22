@@ -1,6 +1,6 @@
 {
     "name": "dense",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "repo": "goodcleanfun/dense",
     "description": "Generic dense matrices",
     "keywords": ["matrix", "dense", "array", "numeric"],
