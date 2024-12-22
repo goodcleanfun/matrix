@@ -32,7 +32,7 @@
 #define CONCAT3(a, b, c) CONCAT3_(a, b, c)
 #define MATRIX_FUNC(name) CONCAT(MATRIX_NAME, _##name)
 #define VECTOR_FUNC(name) CONCAT3(MATRIX_TYPE, _vector, _##name)
-#define FILE_VECTOR_FUNC(name) CONCAT3(name##_, MATRIX_TYPE, _vector)
+#define FILE_ARRAY_FUNC(name) CONCAT3(name##_, MATRIX_TYPE, _array)
 
 typedef struct {
     size_t m, n;
@@ -337,7 +337,7 @@ static MATRIX_NAME *MATRIX_FUNC(read)(FILE *f) {
         goto exit_matrix_allocated;
     }
 
-    if (!FILE_VECTOR_FUNC(file_read)(f, data, len_data)) {
+    if (!FILE_ARRAY_FUNC(file_read)(f, data, len_data)) {
         free(data);
         goto exit_matrix_allocated;
     }
@@ -363,7 +363,7 @@ static bool MATRIX_FUNC(write)(MATRIX_NAME *self, FILE *f) {
 
     MATRIX_TYPE *data = self->values;
     uint64_t len_data = (uint64_t)self->m * (uint64_t)self->n;
-    if (!FILE_VECTOR_FUNC(file_write)(f, data, len_data)) {
+    if (!FILE_ARRAY_FUNC(file_write)(f, data, len_data)) {
         return false;
     }
 
@@ -441,4 +441,4 @@ static inline bool MATRIX_FUNC(dot_matrix)(MATRIX_NAME *m1, MATRIX_NAME *m2, MAT
 #undef CONCAT3
 #undef MATRIX_FUNC
 #undef VECTOR_FUNC
-#undef FILE_VECTOR_FUNC
+#undef FILE_ARRAY_FUNC
