@@ -1,7 +1,7 @@
 {
-    "name": "dense",
+    "name": "matrix",
     "version": "0.3.0",
-    "repo": "goodcleanfun/dense",
+    "repo": "goodcleanfun/matrix",
     "description": "Generic dense matrices",
     "keywords": ["matrix", "dense", "array", "numeric"],
     "license": "MIT",
