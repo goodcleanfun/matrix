@@ -3,7 +3,7 @@
 
 #define MATRIX_NAME uint64_matrix
 #define MATRIX_TYPE uint64_t
-#include "num_arrays/uint64_array.h"
+#include "vector_ops/uint64.h"
 #include "matrix.h"
 #undef MATRIX_NAME
 #undef MATRIX_TYPE

@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 
-#include "aligned/aligned.h"
 #include "file_utils/file_utils.h"
 
 #endif
@@ -24,6 +24,40 @@
 
 #ifndef MATRIX_TYPE
 #error "MATRIX_TYPE must be defined"
+#endif
+
+// Prefer aligned memory for matrices
+#if !defined(MATRIX_MALLOC) && !defined(MATRIX_REALLOC) && !defined(MATRIX_FREE)
+#include "aligned/aligned.h"
+
+#define MATRIX_ALIGNED
+#define MATRIX_ALIGNED_DEFINED
+
+#ifndef MATRIX_MALLOC
+#if defined(MATRIX_ALIGNMENT)
+#define MATRIX_MALLOC(size) aligned_malloc(size, MATRIX_ALIGNMENT)
+#else
+#define MATRIX_MALLOC default_aligned_malloc
+#define MATRIX_MALLOC_DEFINED
+#endif
+#endif
+
+#ifndef MATRIX_REALLOC
+#define MATRIX_REALLOC_NEEDS_PREV_SIZE
+
+#if defined(MATRIX_ALIGNMENT)
+#define MATRIX_REALLOC(a, prev_size, new_size) aligned_resize(a, prev_size, new_size, MATRIX_ALIGNMENT)
+#else
+#define MATRIX_REALLOC default_aligned_resize
+#define MATRIX_REALLOC_DEFINED
+#endif
+#endif
+
+#ifndef MATRIX_FREE
+#define MATRIX_FREE default_aligned_free
+#define MATRIX_FREE_DEFINED
+#endif
+
 #endif
 
 #define CONCAT_(a, b) a ## b
@@ -50,27 +84,7 @@ static MATRIX_NAME *MATRIX_FUNC(new)(size_t m, size_t n) {
     matrix->m = m;
     matrix->n = n;
 
-    matrix->values = malloc(sizeof(MATRIX_TYPE) * m * n);
-    if (matrix->values == NULL) {
-        free(matrix);
-        return NULL;
-    }
-
-    return matrix;
-
-}
-
-static MATRIX_NAME *MATRIX_FUNC(new_aligned)(size_t m, size_t n, size_t alignment) {
-    MATRIX_NAME *matrix = malloc(sizeof(MATRIX_NAME));
-
-    if (matrix == NULL) {
-        return NULL;
-    }
-
-    matrix->m = m;
-    matrix->n = n;
-
-    matrix->values = aligned_malloc(sizeof(MATRIX_TYPE) * m * n, alignment);
+    matrix->values = MATRIX_MALLOC(sizeof(MATRIX_TYPE) * m * n);
     if (matrix->values == NULL) {
         free(matrix);
         return NULL;
@@ -84,17 +98,7 @@ static void MATRIX_FUNC(destroy)(MATRIX_NAME *self) {
     if (self == NULL) return;
 
     if (self->values != NULL) {
-        free(self->values);
-    }
-
-    free(self);
-}
-
-static void MATRIX_FUNC(destroy_aligned)(MATRIX_NAME *self) {
-    if (self == NULL) return;
-
-    if (self->values != NULL) {
-        aligned_free(self->values);
+        MATRIX_FREE(self->values);
     }
 
     free(self);
@@ -109,24 +113,11 @@ static inline bool MATRIX_FUNC(resize)(MATRIX_NAME *self, size_t m, size_t n) {
     if (self == NULL) return false;
 
     if (m * n > (self->m * self->n)) {
-        MATRIX_TYPE *ptr = realloc(self->values, sizeof(MATRIX_TYPE) * m * n);
-        if (ptr == NULL) {
-            return false;
-        }
-        self->values = ptr;
-    }
-
-    self->m = m;
-    self->n = n;
-
-    return true;
-}
-
-static inline bool MATRIX_FUNC(resize_aligned)(MATRIX_NAME *self, size_t m, size_t n, size_t alignment) {
-    if (self == NULL) return false;
-
-    if (m * n > (self->m * self->n)) {
-        MATRIX_TYPE *ptr = aligned_resize(self->values, sizeof(MATRIX_TYPE) * self->m * self->n, sizeof(MATRIX_TYPE) * m * n, alignment);
+        #ifdef MATRIX_REALLOC_NEEDS_PREV_SIZE
+        MATRIX_TYPE *ptr = MATRIX_REALLOC(self->values, sizeof(MATRIX_TYPE) * self->m * self->n, sizeof(MATRIX_TYPE) * m * n);
+        #else
+        MATRIX_TYPE *ptr = MATRIX_REALLOC(self->values, sizeof(MATRIX_TYPE) * m * n);
+        #endif
         if (ptr == NULL) {
             return false;
         }
@@ -142,15 +133,6 @@ static inline bool MATRIX_FUNC(resize_aligned)(MATRIX_NAME *self, size_t m, size
 static inline bool MATRIX_FUNC(resize_fill_zeros)(MATRIX_NAME *self, size_t m, size_t n) {
     size_t old_m = self->m;
     bool ret = MATRIX_FUNC(resize)(self, m, n);
-    if (ret && m > old_m) {
-        memset(self->values + old_m, 0, (m - old_m) * self->n * sizeof(MATRIX_TYPE));
-    }
-    return ret;
-}
-
-static inline bool MATRIX_FUNC(resize_aligned_fill_zeros)(MATRIX_NAME *self, size_t m, size_t n, size_t alignment) {
-    size_t old_m = self->m;
-    bool ret = MATRIX_FUNC(resize_aligned)(self, m, n, alignment);
     if (ret && m > old_m) {
         memset(self->values + old_m, 0, (m - old_m) * self->n * sizeof(MATRIX_TYPE));
     }
@@ -442,3 +424,25 @@ static inline bool MATRIX_FUNC(dot_matrix)(MATRIX_NAME *m1, MATRIX_NAME *m2, MAT
 #undef MATRIX_FUNC
 #undef VECTOR_FUNC
 #undef FILE_ARRAY_FUNC
+#ifdef MATRIX_ALIGNMENT_DEFINED
+#undef MATRIX_ALIGNMENT
+#undef MATRIX_ALIGNMENT_DEFINED
+#endif
+
+#ifdef MATRIX_ALIGNED_DEFINED
+#undef MATRIX_ALIGNED
+#undef MATRIX_ALIGNED_DEFINED
+#endif
+
+#ifdef MATRIX_MALLOC_DEFINED
+#undef MATRIX_MALLOC
+#undef MATRIX_MALLOC_DEFINED
+#endif
+#ifdef MATRIX_REALLOC_DEFINED
+#undef MATRIX_REALLOC
+#undef MATRIX_REALLOC_DEFINED
+#endif
+#ifdef MATRIX_FREE_DEFINED
+#undef MATRIX_FREE
+#undef MATRIX_FREE_DEFINED
+#endif
