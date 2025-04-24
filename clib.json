@@ -11,7 +11,7 @@
     "dependencies": {
       "goodcleanfun/aligned": "*",
       "goodcleanfun/file_utils": "*",
-      "goodcleanfun/vector_ops": "*"
+      "goodcleanfun/vectorized": "*"
     },
     "src": [
       "src/matrix.h",
