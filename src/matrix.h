@@ -309,7 +309,6 @@ static inline void MATRIX_FUNC(dot_vector)(MATRIX_NAME *self, MATRIX_TYPE *vec, 
 
 #define CBLAS_FUNC(name) CONCAT3(cblas_, MATRIX_BLAS_PRECISION, name)
 #define GEMM CBLAS_FUNC(gemm)
-#undef CBLAS_FUNC
 
 static inline bool MATRIX_FUNC(dot_matrix)(MATRIX_NAME *m1, MATRIX_NAME *m2, MATRIX_NAME *result) {
     if (m1->n != m2->m || m1->m != result->m || m2->n != result->n) {
@@ -327,6 +326,7 @@ static inline bool MATRIX_FUNC(dot_matrix)(MATRIX_NAME *m1, MATRIX_NAME *m2, MAT
 }
 
 #undef GEMM
+#undef CBLAS_FUNC
 
 #else
 static inline bool MATRIX_FUNC(dot_matrix)(MATRIX_NAME *m1, MATRIX_NAME *m2, MATRIX_NAME *result) {
@@ -374,6 +374,7 @@ static inline bool MATRIX_FUNC(dot_matrix)(MATRIX_NAME *m1, MATRIX_NAME *m2, MAT
 #undef MATRIX_ALIGNED
 #undef MATRIX_ALIGNED_DEFINED
 #endif
+
 
 #ifdef MATRIX_MALLOC_DEFINED
 #undef MATRIX_MALLOC
