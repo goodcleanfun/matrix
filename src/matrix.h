@@ -7,8 +7,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "file_utils/file_utils.h"
-
 #endif
 
 #ifdef HAVE_CBLAS
