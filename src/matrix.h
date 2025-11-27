@@ -295,63 +295,6 @@ static inline bool MATRIX_FUNC(sub_matrix_scaled)(MATRIX_NAME *self, MATRIX_NAME
     return true;
 }
 
-static MATRIX_NAME *MATRIX_FUNC(read)(FILE *f) {
-    MATRIX_NAME *mat = malloc(sizeof(MATRIX_NAME));
-    if (mat == NULL) return NULL;
-
-    mat->values = NULL;
-
-    uint64_t m = 0;
-    uint64_t n = 0;
-
-    if (!file_read_uint64(f, &m) ||
-        !file_read_uint64(f, &n)) {
-        goto exit_matrix_allocated;
-    }
-
-    mat->m = (size_t)m;
-    mat->n = (size_t)n;
-
-    size_t len_data = mat->m * mat->n;
-
-    MATRIX_TYPE *data = malloc(len_data * sizeof(MATRIX_TYPE));
-    if (data == NULL) {
-        goto exit_matrix_allocated;
-    }
-
-    if (!FILE_ARRAY_FUNC(file_read)(f, data, len_data)) {
-        free(data);
-        goto exit_matrix_allocated;
-    }
-
-    mat->values = data;
-
-    return mat;
-
-exit_matrix_allocated:
-    MATRIX_FUNC(destroy)(mat);
-    return NULL;
-}
-
-static bool MATRIX_FUNC(write)(MATRIX_NAME *self, FILE *f) {
-    if (self == NULL || self->values == NULL) {
-        return false;
-    }
-
-    if (!file_write_uint64(f, (uint64_t)self->m) ||
-        !file_write_uint64(f, (uint64_t)self->n)) {
-        return false;
-    }
-
-    MATRIX_TYPE *data = self->values;
-    uint64_t len_data = (uint64_t)self->m * (uint64_t)self->n;
-    if (!FILE_ARRAY_FUNC(file_write)(f, data, len_data)) {
-        return false;
-    }
-
-    return true;
-}
-
 static inline void MATRIX_FUNC(dot_vector)(MATRIX_NAME *self, MATRIX_TYPE *vec, MATRIX_TYPE *result) {
     MATRIX_TYPE *values = self->values;
     size_t m = self->m;

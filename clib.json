@@ -10,7 +10,6 @@
     },
     "dependencies": {
       "goodcleanfun/aligned": "*",
-      "goodcleanfun/file_utils": "*",
       "goodcleanfun/vectorized": "*"
     },
     "src": [
